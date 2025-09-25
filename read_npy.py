@@ -1,5 +1,8 @@
+import rasterio
 import numpy as np
 import copy
+
+
 class ChangeBandOrder(object):
     def __call__(self, sample):
         """necessary if model was pre-trained on .npy files of BigEarthNet and should be used on other Sentinel-2 images
@@ -31,16 +34,17 @@ class ChangeBandOrder(object):
             reordered_img = reordered_img[:, 40:160, 40:160]
 
         out = {}
-        for k,v in sample.items():
+        for k, v in sample.items():
             if k == "img":
                 out[k] = reordered_img
             else:
                 out[k] = v
 
         return out
-    
 
-img_array = np.load('/mnt/c/Users/abloom/Downloads/sentinel-2-epa/sentinel-2/06-037-1201/S2A_MSIL2A_20210612T182921_N0300_R027_T11SLT_20210612T225023.npy')
+
+img_array = np.load(
+    '/mnt/c/Users/abloom/Downloads/sentinel-2-epa/sentinel-2/06-037-1201/S2A_MSIL2A_20210612T182921_N0300_R027_T11SLT_20210612T225023.npy')
 img_array
 
 # Create a sample dictionary (mimicking what your dataset would provide)
@@ -59,13 +63,12 @@ image_vals = transformed_sample.get("img")
 image_vals.shape
 image_vals
 
-import rasterio
-import rasterio.plot as rplt
-src = rasterio.open('data/1201_match_cal.tiff')
-src_array = src.read()
-src_array.shape
-src_array
-# compare values
-
-# print correlation between the two arrays
-np.corrcoef(image_vals.flatten(), src_array.flatten())
+src = rasterio.open('data/6_37_1201/6_37_1201.tiff')
+src_2 = rasterio.open('data/exact_match.tiff')
+# compare the two arrays
+arr_1 = src.read()
+arr_2 = src_2.read()
+arr_1.shape, arr_2.shape
+np.array_equal(arr_1, arr_2)
+# correlation between the two arrays
+np.corrcoef(arr_1.flatten(), arr_2.flatten())

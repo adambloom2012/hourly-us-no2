@@ -1,8 +1,11 @@
+import os
 from oauthlib.oauth2 import BackendApplicationClient
 from requests_oauthlib import OAuth2Session
-# Your client credentials
-client_id = ''
-client_secret = ''
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="../.env")
+
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
 
 # Create a session
 client = BackendApplicationClient(client_id=client_id)
@@ -65,54 +68,17 @@ request = {
     "input": {
         "bounds": {
             "properties": {"crs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"},
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [
-                            -94.04798984527588,
-                            41.7930725281021,
-                        ],
-                        [
-                            -94.04803276062012,
-                            41.805773608962866,
-                        ],
-                        [
-                            -94.06738758087158,
-                            41.805901566741305,
-                        ],
-                        [
-                            -94.06734466552734,
-                            41.7967199475024,
-                        ],
-                        [
-                            -94.06223773956299,
-                            41.79144072064381,
-                        ],
-                        [
-                            -94.0504789352417,
-                            41.791376727347966,
-                        ],
-                        [
-                            -94.05039310455322,
-                            41.7930725281021,
-                        ],
-                        [
-                            -94.04798984527588,
-                            41.7930725281021,
-                        ],
-                    ]
-                ],
-            },
+            "bbox": [-118.5393684093012, 34.1937592521836, -118.52615242162526, 34.20474043035549]
         },
         "data": [
             {
                 "type": "sentinel-2-l2a",
                 "dataFilter": {
                     "timeRange": {
-                        "from": "2022-10-01T00:00:00Z",
-                        "to": "2022-10-31T00:00:00Z",
-                    }
+                        "from": "2024-01-01T00:00:00Z",
+                        "to": "2024-12-31T00:00:00Z",
+                    },
+                    "mosaickingOrder": "leastCC"
                 },
                 "processing": {"harmonizeValues": "false"},
             }
@@ -136,7 +102,7 @@ response = oauth.post(url, json=request)
 
 # save response as geoTIFF if 200
 if response.status_code == 200:
-    with open("exac_match.tiff", "wb") as f:
+    with open("../data/exact_match.tiff", "wb") as f:
         f.write(response.content)
 # print error message if not 200
 else:

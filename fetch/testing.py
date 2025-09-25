@@ -1,19 +1,31 @@
-from fetch_sentinel_2_data import get_sentinel_data, evalscript
+import os
+from fetch_sentinel_2_data import get_sentinel_data
 import geopandas as gpd
-
 import pandas as pd
 import geopandas as gpd
+from oauthlib.oauth2 import BackendApplicationClient
+from requests_oauthlib import OAuth2Session
 from shapely.geometry import box
-# Your client credentials
-client_id = 'sh-a49d4b07-0097-492e-8197-727532c5aef0'
-client_secret = '1nWsqfoUqdIVUMjqFeJqSL7um7HUooLF'
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="../.env")
 
-df = pd.read_csv("/mnt/c/Users/abloom/Downloads/hourly_42602_2024.csv")
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
+
+# Create a session
+client = BackendApplicationClient(client_id=client_id)
+oauth = OAuth2Session(client=client)
+
+# Get token for the session
+token = oauth.fetch_token(token_url='https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token',
+                          client_secret=client_secret, include_client_id=True)
+
+df = pd.read_csv("/Users/adambloom/Downloads/hourly_42602_2025.csv")
 df = df[(
-                df['State Code'] == 6) 
-             & (df['County Code'] == 37)
-             & (df['Site Num'].isin([1201]))
-                                      ]
+    df['State Code'] == 6)
+    & (df['County Code'] == 37)
+    & (df['Site Num'].isin([1201]))
+]
 df = df[['Latitude', 'Longitude', 'Site Num', 'State Code', 'County Code']]
 df = df.drop_duplicates()
 df.head()
@@ -35,9 +47,9 @@ half_side = 600  # 1200 meters / 2
 # 3. Create the bounding box for each point in the projected CRS
 # We apply a function to each geometry (point) in the projected GeoDataFrame
 boxes = gdf_proj.geometry.apply(lambda point: box(
-    point.x - half_side, 
-    point.y - half_side, 
-    point.x + half_side, 
+    point.x - half_side,
+    point.y - half_side,
+    point.x + half_side,
     point.y + half_side
 ))
 
@@ -51,7 +63,6 @@ gdf['bbox'] = boxes_4326.bounds.values.tolist()
 
 # Display the final result with the new 'bbox' column
 gdf['bbox'].iloc[0]
-test_gdf = gdf.head(1)
-test_gdf
+gdf
 
-get_sentinel_data(client_id, client_secret, test_gdf)
+get_sentinel_data(client_id, client_secret, gdf)
