@@ -1,6 +1,7 @@
 # Load packages into current runtime
 import datetime as dt
 import getpass
+import os
 
 import numpy as np
 import xarray as xr
@@ -12,7 +13,12 @@ from xarray.plot.utils import label_from_attrs
 
 from harmony import BBox, Client, Collection, Request
 from harmony.config import Environment
-harmony_client = Client(auth=('adambloom01', 'md-7AWwk!mDGzRf'))
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="../.env")
+
+client_id = os.getenv("TEMPO_CLIENT_ID")
+client_secret = os.getenv("TEMPO_CLIENT_SECRET")
+harmony_client = Client(auth=(client_id, client_secret))
 
 data_proj = ccrs.PlateCarree()
 

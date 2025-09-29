@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "cartopy>=0.25.0",
     "geopandas>=1.1.1",
     "h5netcdf>=1.6.4",
     "harmony>=1.2.4098",
