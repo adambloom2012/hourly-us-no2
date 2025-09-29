@@ -65,4 +65,6 @@ gdf['bbox'] = boxes_4326.bounds.values.tolist()
 gdf['bbox'].iloc[0]
 gdf
 
-get_sentinel_data(client_id, client_secret, gdf)
+date_of_im = get_sentinel_data(oauth, token, gdf)
+
+print(date_of_im)
